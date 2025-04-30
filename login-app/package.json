@@ -12,7 +12,9 @@
     "koa-bodyparser": "^4.4.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-scripts": "5.0.1",
+    "react-icons": "^5.5.0",
+    "react-scripts": "^5.0.1",
+    "react-toastify": "^11.0.5",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",
     "web-vitals": "^2.1.4"

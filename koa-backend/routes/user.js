@@ -1,5 +1,7 @@
 import Router from 'koa-router';
 import bcrypt from 'bcryptjs';
+import { v1 as uuidv1 } from 'uuid';
+
 import User from '../models/user.js';
 
 const router = new Router();
@@ -10,21 +12,36 @@ router.post('/registry', async (ctx) => {
 
   if (!username || !password) {
     ctx.status = 400;
-    ctx.body = { success: false, message: '用户名和密码不能为空' };
+    ctx.body = { success: false, message: 'Username and password cannot be empty.' };
     return;
   }
 
   const existing = await User.findOne({ where: { username } });
   if (existing) {
     ctx.status = 400;
-    ctx.body = { success: false, message: '用户名已存在' };
+    ctx.body = { success: false, message: 'Username already exists.' };
     return;
   }
-
+  
+  if (!/^[a-zA-Z0-9_]{4,20}$/.test(username)) {
+    ctx.status = 400;
+    ctx.body = { success: false, message: 'Username must be 4-20 characters long and contain only letters, numbers, or underscores.' };
+    return;
+  }
+  
+  if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/.test(password)) {
+    ctx.status = 400;
+    ctx.body = { success: false, message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 12 characters long.' };
+    return;
+  }
+  
   const hashed = await bcrypt.hash(password, 10);
-  await User.create({ username, password: hashed });
+  await User.create({
+    username,
+    password: hashed
+  });
 
-  ctx.body = { success: true, message: '注册成功' };
+  ctx.body = { success: true, message: 'Registration successful.' };
 });
 
 // POST /login
@@ -38,7 +55,7 @@ router.post('/login', async ctx => {
     ctx.body = { success: true, username: user.username };
   } else {
     ctx.status = 401;
-    ctx.body = { success: false, message: '账号或密码错误' };
+    ctx.body = { success: false, message: 'Invalid username or password.' };
   }
 });
 

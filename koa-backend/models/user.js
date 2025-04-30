@@ -1,7 +1,13 @@
 import { DataTypes } from 'sequelize';
+import { v1 as uuidv1 } from 'uuid';
 import sequelize from '../db.js';
 
 const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.STRING,
+    primaryKey: true,
+    defaultValue: () => uuidv1()
+  },
   username: {
     type: DataTypes.STRING,
     unique: true,
@@ -12,6 +18,7 @@ const User = sequelize.define('User', {
     allowNull: false
   }
 });
+
 
 await User.sync();
 export default User;

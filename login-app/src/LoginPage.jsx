@@ -1,11 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import './style.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loginUserName, setLoginUserName] = useState('');
   const [userList, setUserList] = useState([]);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const calculatePasswordStrength = (pwd) => {
+    let score = 0;
+    if (pwd.length >= 12) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[a-z]/.test(pwd)) score++;
+    if (/\d/.test(pwd)) score++;
+    if (/[\W_]/.test(pwd)) score++;
+    return score;
+  };
 
   const fetchUsers = async () => {
     try {
@@ -14,10 +28,10 @@ const LoginPage = () => {
       if (data.success) {
         setUserList(data.users || []);
       } else {
-        alert(data.message || '获取用户列表失败');
+        toast.error(data.message || 'Failed to fetch user list.');
       }
     } catch (err) {
-      alert('网络错误：无法获取用户列表');
+      toast.error('Network error: unable to fetch users.');
     }
   };
 
@@ -33,22 +47,19 @@ const LoginPage = () => {
         body: JSON.stringify({ username, password })
       });
       const data = await res.json();
-  
       if (res.ok && data.success) {
         setLoginUserName(data.username);
-        alert(`欢迎你，${data.username}！`);
+        toast.success(`Welcome, ${data.username}!`);
       } else {
-        alert(data.message || '登录失败');
+        toast.error(data.message || 'Login failed.');
       }
     } catch (err) {
-      alert('网络错误：无法登录');
+      toast.error('Network error: unable to login.');
     } finally {
-      // 登录成功或失败都清空输入
       setUsername('');
       setPassword('');
     }
   };
-  
 
   const handleRegister = async () => {
     try {
@@ -59,24 +70,27 @@ const LoginPage = () => {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        alert('注册成功！');
+        toast.success('Registration successful!');
         setUsername('');
         setPassword('');
         fetchUsers();
       } else {
-        alert(data.message || '注册失败');
+        toast.error(data.message || 'Registration failed.');
       }
     } catch (err) {
-      alert('网络错误：无法注册');
+      toast.error('Network error: unable to register.');
     }
   };
 
+  const strengthScore = calculatePasswordStrength(password);
+  const strengthLabels = ['Very Weak', 'Weak', 'Medium', 'Good', 'Strong', 'Very Strong'];
+
   return (
     <div className="container">
-      <div className="title">登 陆</div>
+      <div className="title">Sign In</div>
 
       <div className="mgb12">
-        <label>用户名</label>
+        <label>Username</label>
         <input
           type="text"
           value={username}
@@ -86,30 +100,51 @@ const LoginPage = () => {
       </div>
 
       <div className="mgb12">
-        <label>密码</label>
-        <input
-          type="text"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-        />
+        <label>Password</label>
+        <div className="password-wrapper">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            className="password-input"
+          />
+          <span
+            className="eye-icon"
+            onClick={() => setShowPassword(!showPassword)}
+            title={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
+          </span>
+        </div>
+
+        <div className="password-strength-bar">
+          <div className={`strength-fill strength-${strengthScore}`}></div>
+        </div>
+        {password && (
+          <span className="strength-label">
+            {strengthLabels[strengthScore]}
+          </span>
+        )}
       </div>
 
-      <button onClick={handleLogin}>登录</button>
-      <button onClick={handleRegister}>注册</button>
+      <button onClick={handleLogin}>Login</button>
+      <button onClick={handleRegister}>Register</button>
 
       <div className="info mgb12">
-        <label>当前登陆的用户：</label>
+        <label>Current logged-in user: </label>
         <span>{loginUserName}</span>
       </div>
 
       <div className="users">
-        <div className="title">所有注册用户</div>
+        <div className="title">Registered Users</div>
         <div id="userList">
           {userList.map((user, index) => (
             <div key={index}>{user}</div>
           ))}
         </div>
       </div>
+
+      <ToastContainer position="top-center" autoClose={2000} />
     </div>
   );
 };

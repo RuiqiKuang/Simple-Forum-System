@@ -6,7 +6,6 @@ const app = new Koa();
 
 app.use(bodyParser());
 
-// CORS 设置
 app.use(async (ctx, next) => {
   ctx.set('Access-Control-Allow-Origin', '*');
   ctx.set('Access-Control-Allow-Headers', 'Content-Type');
@@ -17,7 +16,6 @@ app.use(async (ctx, next) => {
   }
 });
 
-// 路由加载
 app.use(userRoutes.routes()).use(userRoutes.allowedMethods());
 
 app.listen(3001, () => {

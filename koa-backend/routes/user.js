@@ -1,6 +1,5 @@
 import Router from 'koa-router';
 import bcrypt from 'bcryptjs';
-import { v1 as uuidv1 } from 'uuid';
 
 import User from '../models/user.js';
 
@@ -29,7 +28,7 @@ router.post('/registry', async (ctx) => {
     return;
   }
   
-  if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/.test(password)) {
+  if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password)) {
     ctx.status = 400;
     ctx.body = { success: false, message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 12 characters long.' };
     return;

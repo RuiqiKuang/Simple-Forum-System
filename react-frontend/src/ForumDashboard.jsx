@@ -1,4 +1,3 @@
-// ForumDashboard.jsx (React Frontend - Styled)
 import React, { useState, useEffect } from 'react';
 import './forum.css';
 
@@ -25,7 +24,11 @@ const ForumDashboard = () => {
   };
 
   const handleLike = async (postId) => {
-    await fetch(`http://localhost:3001/posts/${postId}/like`, { method: 'POST' });
+    await fetch(`http://localhost:3001/posts/${postId}/like`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username })
+    });
     fetchPosts();
   };
 
@@ -63,8 +66,15 @@ const ForumDashboard = () => {
               {post.content}
             </div>
             <div className="post-footer">
-              <button className="like-btn" onClick={() => handleLike(post.id)}>❤️ {post.likes}</button>
+              <button className="like-btn" onClick={() => handleLike(post.id)}>
+                ❤️ {post.likes}
+              </button>
             </div>
+            {post.likers.length > 0 && (
+              <div className="post-likers">
+                <span>Liked by: {post.likers.join(', ')}</span>
+              </div>
+            )}
           </div>
         ))}
       </div>

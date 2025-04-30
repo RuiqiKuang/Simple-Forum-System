@@ -1,17 +1,16 @@
-// routes/post.js (Koa Backend)
 import Router from 'koa-router';
 import { v4 as uuidv4 } from 'uuid';
 import Post from '../models/post.js';
 import User from '../models/user.js';
+import Like from '../models/like.js';
 
 const router = new Router();
 
-// Middleware to validate user identity via username
 async function validateUser(ctx, next) {
   const username = ctx.request.body.username;
   if (!username) {
     ctx.status = 401;
-    ctx.body = { success: false, message: 'Username required for this action' };
+    ctx.body = { success: false, message: 'Username required' };
     return;
   }
   const user = await User.findOne({ where: { username } });
@@ -20,23 +19,28 @@ async function validateUser(ctx, next) {
     ctx.body = { success: false, message: 'Invalid user' };
     return;
   }
-  ctx.state.user = user; // store user in context for downstream access
+  ctx.state.user = user;
   await next();
 }
 
-// GET /posts
+// GET /posts (with likers)
 router.get('/posts', async ctx => {
   const posts = await Post.findAll({
-    include: { model: User, attributes: ['username'] },
+    include: [
+      { model: User, attributes: ['username'] },
+      { model: User, as: 'Likers', attributes: ['username'] }
+    ],
     order: [['createdAt', 'DESC']]
   });
+
   ctx.body = {
     success: true,
     posts: posts.map(p => ({
       id: p.id,
       content: p.content,
-      likes: p.likes,
-      username: p.User.username
+      likes: p.Likers.length,
+      username: p.User.username,
+      likers: p.Likers.map(u => u.username)
     }))
   };
 });
@@ -48,23 +52,29 @@ router.post('/posts', validateUser, async ctx => {
   const post = await Post.create({
     id: uuidv4(),
     content,
-    userId: user.id,
-    likes: 0
+    userId: user.id
   });
   ctx.body = { success: true, post };
 });
 
-// POST /posts/:id/like
-router.post('/posts/:id/like', async ctx => {
+// POST /posts/:id/like (toggle like/unlike)
+router.post('/posts/:id/like', validateUser, async ctx => {
   const post = await Post.findByPk(ctx.params.id);
+  const user = ctx.state.user;
   if (!post) {
     ctx.status = 404;
     ctx.body = { success: false, message: 'Post not found' };
     return;
   }
-  post.likes++;
-  await post.save();
-  ctx.body = { success: true, likes: post.likes };
+  const existing = await Like.findOne({ where: { userId: user.id, postId: post.id } });
+
+  if (existing) {
+    await existing.destroy();
+    ctx.body = { success: true, action: 'unliked' };
+  } else {
+    await Like.create({ id: uuidv4(), userId: user.id, postId: post.id });
+    ctx.body = { success: true, action: 'liked' };
+  }
 });
 
 export default router;

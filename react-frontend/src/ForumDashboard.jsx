@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
 import './forum.css';
 
 const ForumDashboard = () => {
-  const [username, setUsername] = useState(localStorage.getItem('username') || '');
+  const [username] = useState(localStorage.getItem('username') || '');
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
 
@@ -24,12 +25,16 @@ const ForumDashboard = () => {
   };
 
   const handleLike = async (postId) => {
-    await fetch(`http://localhost:3001/posts/${postId}/like`, {
+    const res = await fetch(`http://localhost:3001/posts/${postId}/like`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username })
     });
-    fetchPosts();
+    const data = await res.json();
+    if (data.success) {
+      toast.success(data.action === 'liked' ? '❤️ You liked this post!' : '💔 You unliked this post.');
+      fetchPosts(); // or just update likes count locally
+    }
   };
 
   useEffect(() => {
@@ -78,6 +83,7 @@ const ForumDashboard = () => {
           </div>
         ))}
       </div>
+      <ToastContainer position="top-center" autoClose={2000} />
     </div>
   );
 };

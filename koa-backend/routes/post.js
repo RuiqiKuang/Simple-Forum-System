@@ -70,10 +70,16 @@ router.post('/posts/:id/like', validateUser, async ctx => {
 
   if (existing) {
     await existing.destroy();
-    ctx.body = { success: true, action: 'unliked' };
+    const likeCount = await Like.count({ where: { postId: post.id } });
+    post.likes = likeCount;
+    await post.save();
+    ctx.body = { success: true, action: 'unliked', likes: likeCount };
   } else {
     await Like.create({ id: uuidv4(), userId: user.id, postId: post.id });
-    ctx.body = { success: true, action: 'liked' };
+    const likeCount = await Like.count({ where: { postId: post.id } });
+    post.likes = likeCount;
+    await post.save();
+    ctx.body = { success: true, action: 'liked', likes: likeCount };
   }
 });
 

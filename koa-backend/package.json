@@ -13,9 +13,11 @@
   "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "dotenv": "^16.5.0",
     "koa": "^3.0.0",
     "koa-bodyparser": "^4.4.1",
     "koa-router": "^13.0.1",
+    "pg": "^8.15.6",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",
     "uuid": "^11.1.0"

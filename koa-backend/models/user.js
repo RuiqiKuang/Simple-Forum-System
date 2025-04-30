@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
-import { v1 as uuidv1 } from 'uuid';
 import sequelize from '../db.js';
+import { v1 as uuidv1 } from 'uuid';
 
 const User = sequelize.define('User', {
   id: {
@@ -19,6 +19,4 @@ const User = sequelize.define('User', {
   }
 });
 
-
-await User.sync();
 export default User;

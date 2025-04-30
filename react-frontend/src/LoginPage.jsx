@@ -3,6 +3,7 @@ import './style.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -10,7 +11,7 @@ const LoginPage = () => {
   const [loginUserName, setLoginUserName] = useState('');
   const [userList, setUserList] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
-
+  const navigate = useNavigate();
   const calculatePasswordStrength = (pwd) => {
     let score = 0;
     if (pwd.length >= 12) score++;
@@ -48,8 +49,11 @@ const LoginPage = () => {
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        
         setLoginUserName(data.username);
+        localStorage.setItem('username', data.username);
         toast.success(`Welcome, ${data.username}!`);
+        setTimeout(() => navigate('/forum'), 800);
       } else {
         toast.error(data.message || 'Login failed.');
       }

@@ -1,0 +1,99 @@
+/* style.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to right, #74ebd5, #acb6e5);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .container {
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    width: 360px;
+    max-width: 90%;
+    text-align: center;
+  }
+  
+  .title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 24px;
+    color: #333;
+  }
+  
+  .mgb12 {
+    margin-bottom: 16px;
+    text-align: left;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #555;
+  }
+  
+  input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    transition: 0.2s;
+  }
+  
+  input[type="text"]:focus {
+    border-color: #74ebd5;
+    box-shadow: 0 0 5px rgba(116, 235, 213, 0.5);
+  }
+  
+  button {
+    width: 48%;
+    text-align: center;
+    padding: 10px 0;
+    margin: 8px 1%;
+    border: none;
+    border-radius: 8px;
+    background: #6a11cb;
+    background: linear-gradient(to right, #2575fc, #6a11cb);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.3s ease;
+  }
+  
+  button:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+  }
+  
+  .info {
+    font-size: 14px;
+    color: #555;
+    margin-top: 12px;
+  }
+  
+  .users {
+    margin-top: 24px;
+    text-align: left;
+  }
+  
+  .users .title {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #444;
+  }
+  
+  #userList div {
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+  }
+  

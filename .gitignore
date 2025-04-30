@@ -1,0 +1,46 @@
+# ===========================
+# Node.js
+# ===========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+build/
+
+# ===========================
+# React
+# ===========================
+# Ignore build outputs
+login-app/build/
+
+# React testing files
+*.test.js
+*.test.jsx
+coverage/
+
+# ===========================
+# SQLite Database
+# ===========================
+*.sqlite
+*.sqlite-journal
+
+# ===========================
+# Environment variables
+# ===========================
+.env
+.env.local
+.env.*.local
+
+# ===========================
+# macOS & VSCode
+# ===========================
+.DS_Store
+.vscode/
+
+# ===========================
+# Logs
+# ===========================
+logs/
+*.log

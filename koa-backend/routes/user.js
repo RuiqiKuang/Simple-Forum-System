@@ -30,7 +30,7 @@ router.post('/registry', async (ctx) => {
   
   if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password)) {
     ctx.status = 400;
-    ctx.body = { success: false, message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 12 characters long.' };
+    ctx.body = { success: false, message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long.' };
     return;
   }
   

@@ -24,7 +24,7 @@ async function validateUser(ctx, next) {
 }
 
 // GET /posts (with likers)
-router.get('/posts', async ctx => {
+router.get('/posts', async (ctx) => {
   const posts = await Post.findAll({
     include: [
       { model: User, attributes: ['username'] },
@@ -46,7 +46,7 @@ router.get('/posts', async ctx => {
 });
 
 // POST /posts
-router.post('/posts', validateUser, async ctx => {
+router.post('/posts', validateUser, async (ctx) => {
   const { content } = ctx.request.body;
   const user = ctx.state.user;
   const post = await Post.create({
@@ -58,7 +58,7 @@ router.post('/posts', validateUser, async ctx => {
 });
 
 // POST /posts/:id/like (toggle like/unlike)
-router.post('/posts/:id/like', validateUser, async ctx => {
+router.post('/posts/:id/like', validateUser, async (ctx) => {
   const post = await Post.findByPk(ctx.params.id);
   const user = ctx.state.user;
   if (!post) {

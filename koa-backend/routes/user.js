@@ -44,7 +44,7 @@ router.post('/registry', async (ctx) => {
 });
 
 // POST /login
-router.post('/login', async ctx => {
+router.post('/login', async (ctx) => {
   const { username, password } = ctx.request.body;
 
   const user = await User.findOne({ where: { username } });
@@ -59,7 +59,7 @@ router.post('/login', async ctx => {
 });
 
 // GET /users
-router.get('/users', async ctx => {
+router.get('/users', async (ctx) => {
   const users = await User.findAll();
   ctx.body = { success: true, users: users.map(u => u.username) };
 });

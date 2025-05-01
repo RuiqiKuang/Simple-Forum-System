@@ -40,6 +40,7 @@ router.get('/posts', async (ctx) => {
       content: p.content,
       likes: p.Likers.length,
       username: p.User.username,
+      createdAt: p.createdAt,           
       likers: p.Likers.map(u => u.username)
     }))
   };

@@ -33,7 +33,7 @@ const ForumDashboard = () => {
     const data = await res.json();
     if (data.success) {
       toast.success(data.action === 'liked' ? '❤️ You liked this post!' : '💔 You unliked this post.');
-      fetchPosts(); // or just update likes count locally
+      fetchPosts();
     }
   };
 
@@ -43,22 +43,23 @@ const ForumDashboard = () => {
 
   return (
     <div className="forum-container">
-      <div className="top-bar">
-        <span className="greeting">Hi, {username}</span>
-        <button className="logout-btn" onClick={() => {
-          localStorage.removeItem('username');
-          window.location.href = '/';
-        }}>Logout</button>
-      </div>
-
-      <div className="new-post-card">
-        <textarea
-          value={newPost}
-          onChange={e => setNewPost(e.target.value)}
-          placeholder="Share something new..."
-          className="new-post-input"
-        />
-        <button className="post-btn" onClick={handleNewPost}>Post</button>
+      <div className="dashboard-header">
+        <div className="top-bar">
+          <span className="greeting">Hi, {username}</span>
+          <button className="logout-btn" onClick={() => {
+            localStorage.removeItem('username');
+            window.location.href = '/';
+          }}>Logout</button>
+        </div>
+        <div className="new-post-card">
+          <textarea
+            value={newPost}
+            onChange={e => setNewPost(e.target.value)}
+            placeholder="Share something new..."
+            className="new-post-input"
+          />
+          <button className="post-btn" onClick={handleNewPost}>Post</button>
+        </div>
       </div>
 
       <div className="post-list">
@@ -66,6 +67,9 @@ const ForumDashboard = () => {
           <div key={post.id} className="post-card">
             <div className="post-header">
               <strong>{post.username}</strong>
+              <span className="post-time">
+                • {new Date(post.createdAt).toLocaleString()}
+              </span>
             </div>
             <div className="post-content">
               {post.content}

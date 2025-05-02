@@ -12,8 +12,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@koa/cors": "^5.0.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.5.0",
+    "jsonwebtoken": "^9.0.2",
     "koa": "^3.0.0",
     "koa-bodyparser": "^4.4.1",
     "koa-router": "^13.0.1",

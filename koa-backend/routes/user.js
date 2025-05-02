@@ -2,6 +2,7 @@ import Router from 'koa-router';
 import bcrypt from 'bcryptjs';
 
 import User from '../models/user.js';
+import { createToken } from '../utils/auth.js';
 
 const router = new Router();
 
@@ -51,6 +52,12 @@ router.post('/login', async (ctx) => {
   const valid = user && await bcrypt.compare(password, user.password);
 
   if (valid) {
+    const token = createToken({ id: user.id, username: user.username });
+    ctx.cookies.set('token', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000
+    });
     ctx.body = { success: true, username: user.username };
   } else {
     ctx.status = 401;
@@ -63,5 +70,16 @@ router.get('/users', async (ctx) => {
   const users = await User.findAll();
   ctx.body = { success: true, users: users.map(u => u.username) };
 });
+
+//Logout
+router.post('/logout', async (ctx) => {
+  ctx.cookies.set('token', '', {
+    httpOnly: true,
+    maxAge: 0,
+    sameSite: 'lax'
+  });
+  ctx.body = { success: true, message: 'Logged out' };
+});
+
 
 export default router;

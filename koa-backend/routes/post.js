@@ -3,28 +3,32 @@ import { v4 as uuidv4 } from 'uuid';
 import Post from '../models/post.js';
 import User from '../models/user.js';
 import Like from '../models/like.js';
-
+import { verifyToken } from '../utils/auth.js';
 const router = new Router();
 
 async function validateUser(ctx, next) {
-  const username = ctx.request.body.username;
-  if (!username) {
+  const token = ctx.cookies.get('token');
+  const payload = verifyToken(token);
+
+  if (!payload) {
     ctx.status = 401;
-    ctx.body = { success: false, message: 'Username required' };
+    ctx.body = { success: false, message: 'Unauthorized' };
     return;
   }
-  const user = await User.findOne({ where: { username } });
+
+  const user = await User.findByPk(payload.id);
   if (!user) {
-    ctx.status = 403;
-    ctx.body = { success: false, message: 'Invalid user' };
+    ctx.status = 401;
+    ctx.body = { success: false, message: 'User not found' };
     return;
   }
+
   ctx.state.user = user;
   await next();
 }
 
 // GET /posts (with likers)
-router.get('/posts', async (ctx) => {
+router.get('/posts', validateUser, async (ctx) => {
   const posts = await Post.findAll({
     include: [
       { model: User, attributes: ['username'] },
@@ -83,5 +87,24 @@ router.post('/posts/:id/like', validateUser, async (ctx) => {
     ctx.body = { success: true, action: 'liked', likes: likeCount };
   }
 });
+
+//auth
+router.get('/me', async (ctx) => {
+  try {
+    const token = ctx.cookies.get('token');
+    const payload = verifyToken(token);
+    if (!payload) {
+      ctx.status = 401;
+      ctx.body = { success: false, message: 'Unauthorized' };
+      return;
+    }
+    ctx.body = { success: true, username: payload.username };
+  } catch (err) {
+    console.error('JWT verify error:', err);
+    ctx.status = 500;
+    ctx.body = { success: false, message: 'Internal server error' };
+  }
+});
+
 
 export default router;

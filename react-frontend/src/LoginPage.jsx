@@ -16,23 +16,23 @@ const LoginPage = () => {
       const res = await fetch('http://localhost:3001/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ username, password })
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        localStorage.setItem('username', data.username);
         toast.success(`Welcome, ${data.username}!`);
         setTimeout(() => navigate('/forum'), 800);
       } else {
         toast.error(data.message || 'Login failed.');
       }
-    } catch (err) {
+    } catch {
       toast.error('Network error: unable to login.');
     } finally {
       setUsername('');
       setPassword('');
     }
-  };
+  };  
 
   return (
     <div className="container">

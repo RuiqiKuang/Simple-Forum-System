@@ -8,34 +8,43 @@ const ForumDashboard = () => {
   const [newPost, setNewPost] = useState('');
 
   const fetchPosts = async () => {
-    const res = await fetch('http://localhost:3001/posts');
+    const res = await fetch('http://localhost:3001/posts', {
+      credentials: 'include'
+    });
     const data = await res.json();
     if (data.success) setPosts(data.posts);
   };
 
   const handleNewPost = async () => {
     if (!newPost.trim()) return;
+  
     await fetch('http://localhost:3001/posts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: newPost, username })
+      credentials: 'include',
+      body: JSON.stringify({ content: newPost })
     });
+  
     setNewPost('');
     fetchPosts();
   };
+  
 
   const handleLike = async (postId) => {
     const res = await fetch(`http://localhost:3001/posts/${postId}/like`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username })
+      credentials: 'include',
+      body: JSON.stringify({})
     });
+  
     const data = await res.json();
     if (data.success) {
       toast.success(data.action === 'liked' ? '❤️ You liked this post!' : '💔 You unliked this post.');
       fetchPosts();
     }
   };
+  
 
   useEffect(() => {
     fetchPosts();
@@ -46,8 +55,11 @@ const ForumDashboard = () => {
       <div className="dashboard-header">
         <div className="top-bar">
           <span className="greeting">Hi, {username}</span>
-          <button className="logout-btn" onClick={() => {
-            localStorage.removeItem('username');
+          <button className="logout-btn" onClick={async () => {
+            await fetch('http://localhost:3001/logout', {
+              method: 'POST',
+              credentials: 'include'
+            });
             window.location.href = '/';
           }}>Logout</button>
         </div>

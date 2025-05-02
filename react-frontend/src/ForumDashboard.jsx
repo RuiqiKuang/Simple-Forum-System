@@ -1,12 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
+import CommentSection from './CommentSection';
 import './forum.css';
 
 const ForumDashboard = () => {
-  const [username] = useState(localStorage.getItem('username') || '');
+  const [username, setUsername] = useState('');
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
 
+  useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const res = await fetch('http://localhost:3001/me', {
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (data.success) {
+          setUsername(data.username);
+        }
+      } catch (err) {
+        console.error('Failed to fetch current user:', err);
+      }
+    };
+  
+    fetchMe();
+  }, []);
+  
   const fetchPosts = async () => {
     const res = await fetch('http://localhost:3001/posts', {
       credentials: 'include'
@@ -96,6 +115,7 @@ const ForumDashboard = () => {
                 <span>Liked by: {post.likers.join(', ')}</span>
               </div>
             )}
+            <CommentSection postId={post.id} />
           </div>
         ))}
       </div>

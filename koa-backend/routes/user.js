@@ -1,8 +1,8 @@
 import Router from 'koa-router';
 import bcrypt from 'bcryptjs';
-
+import Post from '../models/post.js';
 import User from '../models/user.js';
-import { createToken } from '../utils/auth.js';
+import { createToken, validateUser } from '../utils/auth.js';
 
 const router = new Router();
 
@@ -64,6 +64,53 @@ router.post('/login', async (ctx) => {
     ctx.body = { success: false, message: 'Invalid username or password.' };
   }
 });
+
+router.get('/users/:username/profile', async (ctx) => {
+  const { username } = ctx.params;
+
+  const user = await User.findOne({ where: { username } });
+  if (!user) {
+    ctx.status = 404;
+    ctx.body = { success: false, message: 'User not found' };
+    return;
+  }
+
+  const userPosts = await Post.findAll({
+    where: { userId: user.id },
+    order: [['createdAt', 'DESC']],
+    include: [{ model: User, attributes: ['username'] }, { model: User, as: 'Likers', attributes: ['username'] }]
+  });
+
+  const likedPosts = await user.getLikedPosts({
+    order: [['createdAt', 'DESC']],
+    include: [{ model: User, attributes: ['username'] }, { model: User, as: 'Likers', attributes: ['username'] }]
+  });
+
+  ctx.body = {
+    success: true,
+    profile: {
+      username: user.username,
+      posts: userPosts.map(p => ({
+        id: p.id,
+        content: p.content,
+        createdAt: p.createdAt,
+        username: p.User.username,
+        likes: p.Likers.length,
+        likers: p.Likers.map(u => u.username)
+      })),
+      likedPosts: likedPosts.map(p => ({
+        id: p.id,
+        content: p.content,
+        createdAt: p.createdAt,
+        username: p.User.username,
+        likes: p.Likers.length,
+        likers: p.Likers.map(u => u.username)
+      }))
+    }
+  };
+});
+
+
 
 // GET /users
 router.get('/users', async (ctx) => {

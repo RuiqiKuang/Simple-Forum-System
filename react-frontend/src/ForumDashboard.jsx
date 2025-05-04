@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import CommentSection from './CommentSection';
 import './forum.css';
@@ -74,6 +75,9 @@ const ForumDashboard = () => {
       <div className="dashboard-header">
         <div className="top-bar">
           <span className="greeting">Hi, {username}</span>
+          <Link to={`/profile/${username}`}>
+            <button className="profile-btn">My Profile</button>
+          </Link>
           <button className="logout-btn" onClick={async () => {
             await fetch('http://localhost:3001/logout', {
               method: 'POST',

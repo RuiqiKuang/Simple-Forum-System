@@ -202,3 +202,41 @@ body {
     cursor: pointer;
   }
   
+  .profile-btn {
+    background-color: #4da6ff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    min-width: 100px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  
+  
+  .profile-btn:hover {
+    background-color: #3399ff;
+  }
+
+  .tab-buttons .post-btn {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    background-color: #f2f2f2;
+    color: #6a5;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .tab-buttons .post-btn:hover {
+    background-color: #e6e6e6;
+  }
+  
+  .tab-buttons .post-btn.active {
+    background-color: #4caf50;
+    border-color: #4caf50;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }

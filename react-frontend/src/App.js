@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
 import ForumDashboard from './ForumDashboard';
+import UserProfile from './UserProfile';
 import RequireAuth from './utils/RequireAuth';
 
 const App = () => (
@@ -19,6 +20,14 @@ const App = () => (
           </RequireAuth>
         }
       />
+      <Route
+          path="/profile/:username"
+          element={
+            <RequireAuth>
+              <UserProfile />
+            </RequireAuth>
+          }
+        />
     </Routes>
   </Router>
 );

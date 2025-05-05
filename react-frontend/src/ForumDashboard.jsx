@@ -6,27 +6,30 @@ import './forum.css';
 
 const ForumDashboard = () => {
   const [username, setUsername] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
 
   useEffect(() => {
-    const fetchMe = async () => {
-      try {
-        const res = await fetch('http://localhost:3001/me', {
-          credentials: 'include'
-        });
-        const data = await res.json();
+    fetch('http://localhost:3001/me', { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
         if (data.success) {
           setUsername(data.username);
+          fetch(`http://localhost:3001/users/${data.username}/profile`, {
+            credentials: 'include'
+          })
+            .then(res => res.json())
+            .then(profileData => {
+              if (profileData.success && profileData.profile.avatar) {
+                const url = `${profileData.profile.avatar}?t=${Date.now()}`;
+                setAvatarUrl(url);
+              }
+            });
         }
-      } catch (err) {
-        console.error('Failed to fetch current user:', err);
-      }
-    };
-  
-    fetchMe();
+      });
   }, []);
-  
+
   const fetchPosts = async () => {
     const res = await fetch('http://localhost:3001/posts', {
       credentials: 'include'
@@ -35,20 +38,21 @@ const ForumDashboard = () => {
     if (data.success) setPosts(data.posts);
   };
 
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
   const handleNewPost = async () => {
     if (!newPost.trim()) return;
-  
     await fetch('http://localhost:3001/posts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify({ content: newPost })
     });
-  
     setNewPost('');
     fetchPosts();
   };
-  
 
   const handleLike = async (postId) => {
     const res = await fetch(`http://localhost:3001/posts/${postId}/like`, {
@@ -57,35 +61,47 @@ const ForumDashboard = () => {
       credentials: 'include',
       body: JSON.stringify({})
     });
-  
+
     const data = await res.json();
     if (data.success) {
       toast.success(data.action === 'liked' ? '❤️ You liked this post!' : '💔 You unliked this post.');
       fetchPosts();
     }
   };
-  
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
 
   return (
     <div className="forum-container">
       <div className="dashboard-header">
-        <div className="top-bar">
-          <span className="greeting">Hi, {username}</span>
-          <Link to={`/profile/${username}`}>
-            <button className="profile-btn">My Profile</button>
-          </Link>
-          <button className="logout-btn" onClick={async () => {
-            await fetch('http://localhost:3001/logout', {
-              method: 'POST',
-              credentials: 'include'
-            });
-            window.location.href = '/';
-          }}>Logout</button>
+        <div className="top-bar" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {avatarUrl && (
+              <img
+                src={avatarUrl}
+                alt="avatar"
+                style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+              />
+            )}
+            <span className="greeting">Hi, {username}</span>
+          </div>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <Link to={`/profile/${username}`}>
+              <button className="profile-btn">My Profile</button>
+            </Link>
+            <button
+              className="logout-btn"
+              onClick={async () => {
+                await fetch('http://localhost:3001/logout', {
+                  method: 'POST',
+                  credentials: 'include'
+                });
+                window.location.href = '/';
+              }}
+            >
+              Logout
+            </button>
+          </div>
         </div>
+
         <div className="new-post-card">
           <textarea
             value={newPost}

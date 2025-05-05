@@ -6,16 +6,34 @@ const UserProfile = () => {
   const { username } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+
   const [profile, setProfile] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [activeTab, setActiveTab] = useState('posts');
+  const [loggedInUser, setLoggedInUser] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState('');
+
+  useEffect(() => {
+    fetch('http://localhost:3001/me', { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) setLoggedInUser(data.username);
+      });
+  }, []);
 
   useEffect(() => {
     fetch(`http://localhost:3001/users/${username}/profile`, {
-      credentials: 'include',
+      credentials: 'include'
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) setProfile(data.profile);
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setProfile(data.profile);
+          const url = `${data.profile.avatar}?t=${Date.now()}`;
+          setAvatarUrl(url);
+        }
       });
   }, [username]);
 
@@ -26,6 +44,44 @@ const UserProfile = () => {
       setActiveTab('posts');
     }
   }, [location]);
+
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+    setUploading(true);
+    setUploadStatus('');
+
+    const formData = new FormData();
+    formData.append('avatar', selectedFile);
+
+    try {
+      const res = await fetch('http://localhost:3001/upload-avatar', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      });
+
+      const data = await res.json();
+      console.log(data);
+      if (data.success && data.imageUrl) {
+        const updatedUrl = `${data.imageUrl}?t=${Date.now()}`;
+        setAvatarUrl(updatedUrl);
+        setProfile(prev => ({ ...prev, avatar: data.imageUrl }));
+        setSelectedFile(null);
+        setUploadStatus('success');
+      } else {
+        setUploadStatus('error');
+      }
+    } catch (err) {
+      setUploadStatus('error');
+    }
+
+    setUploading(false);
+    setTimeout(() => setUploadStatus(''), 3000);
+  };
 
   const renderPosts = (list) =>
     list.map((post) => (
@@ -48,15 +104,52 @@ const UserProfile = () => {
 
   if (!profile) return <div>Loading profile...</div>;
 
+  const isOwnProfile = loggedInUser === profile.username;
+
   return (
     <div className="forum-container">
       <div className="dashboard-header" style={{ paddingBottom: '0' }}>
-        <div className="top-bar">
-          <span className="greeting">👤 {profile.username}'s Profile</span>
+        <div className="top-bar" style={{ justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img
+              src={avatarUrl}
+              alt="avatar"
+              style={{ width: '48px', height: '48px', borderRadius: '50%' }}
+            />
+            <span className="greeting">👤 {profile.username}'s Profile</span>
+          </div>
           <Link to="/forum">
             <button className="logout-btn">← Back to Forum</button>
           </Link>
         </div>
+
+        {isOwnProfile && (
+          <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <input type="file" onChange={handleFileChange} />
+              <button
+                className={`post-btn ${uploading ? 'disabled' : ''}`}
+                onClick={handleUpload}
+                disabled={uploading}
+                style={{
+                  backgroundColor: uploading ? '#ccc' : '#007bff',
+                  color: uploading ? '#666' : 'white',
+                  cursor: uploading ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {uploading ? 'Uploading...' : '📤 Upload Avatar'}
+              </button>
+            </div>
+
+            {uploadStatus === 'success' && (
+              <div style={{ color: 'green' }}>✅ Avatar uploaded successfully!</div>
+            )}
+            {uploadStatus === 'error' && (
+              <div style={{ color: 'red' }}>❌ Failed to upload avatar.</div>
+            )}
+          </div>
+        )}
+
         <div className="tab-buttons" style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
           <button
             className={`post-btn ${activeTab === 'posts' ? 'active' : ''}`}

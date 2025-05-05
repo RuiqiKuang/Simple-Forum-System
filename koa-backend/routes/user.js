@@ -90,6 +90,7 @@ router.get('/users/:username/profile', async (ctx) => {
     success: true,
     profile: {
       username: user.username,
+      avatar: user.avatar,
       posts: userPosts.map(p => ({
         id: p.id,
         content: p.content,

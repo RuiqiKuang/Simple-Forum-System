@@ -1,6 +1,8 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../db.js';
 import { v1 as uuidv1 } from 'uuid';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const User = sequelize.define('User', {
   id: {
@@ -16,6 +18,11 @@ const User = sequelize.define('User', {
   password: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  avatar: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: process.env.DEFAULT_AVATAR_URL
   }
 });
 

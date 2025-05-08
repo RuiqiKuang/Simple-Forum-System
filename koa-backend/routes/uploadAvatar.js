@@ -40,7 +40,7 @@ router.post('/upload-avatar', upload.single('avatar'), async (ctx) => {
       const filename = `avatars/${uuidv4()}.${fileExt}`;
   
       const uploadParams = {
-        Bucket: process.env.S3_BUCKET_NAME,
+        Bucket: process.env.AVATAR_S3_BUCKET_NAME,
         Key: filename,
         Body: file.buffer,
         ContentType: file.mimetype
@@ -48,7 +48,7 @@ router.post('/upload-avatar', upload.single('avatar'), async (ctx) => {
   
       await s3.send(new PutObjectCommand(uploadParams));
   
-      const imageUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${filename}`;
+      const imageUrl = `https://${process.env.AVATAR_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${filename}`;
 
       const user = await User.findByPk(userData.id);
       if (!user) {

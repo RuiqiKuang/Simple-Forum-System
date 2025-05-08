@@ -13,4 +13,4 @@ await Post.sync();
 await Like.sync();
 await Comment.sync();
 
-export { User, Post, Like };
+export { User, Post, Like, Comment };
